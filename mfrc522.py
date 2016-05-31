@@ -1,4 +1,5 @@
 from machine import Pin, SPI
+from os import uname
 
 
 class MFRC522:
@@ -7,19 +8,30 @@ class MFRC522:
 	NOTAGERR = 1
 	ERR = 2
 
-	def __init__(self):
+	REQIDL = 0x26
+	REQALL = 0x52
+	AUTHENT1A = 0x60
+	AUTHENT1B = 0x61
 
-		self.sck = Pin(0, Pin.OUT)
-		self.mosi = Pin(2, Pin.OUT)
-		self.miso = Pin(4)
-		self.rst = Pin(5, Pin.OUT)
-		self.cs = Pin(14, Pin.OUT)
+	def __init__(self, sck, mosi, miso, rst, cs):
+
+		self.sck = Pin(sck, Pin.OUT)
+		self.mosi = Pin(mosi, Pin.OUT)
+		self.miso = Pin(miso)
+		self.rst = Pin(rst, Pin.OUT)
+		self.cs = Pin(cs, Pin.OUT)
 
 		self.rst.value(0)
 		self.cs.value(1)
 
-		self.spi = SPI(baudrate=100000, polarity=0, phase=0, sck=self.sck, mosi=self.mosi, miso=self.miso)
-		self.spi.init()
+		if uname()[0] == 'WiPy':
+			self.spi = SPI(0)
+			self.spi.init(SPI.MASTER, baudrate=1000000, pins=(self.sck, self.mosi, self.miso))
+		elif uname()[0] == 'esp8266':
+			self.spi = SPI(baudrate=100000, polarity=0, phase=0, sck=self.sck, mosi=self.mosi, miso=self.miso)
+			self.spi.init()
+		else:
+			raise RuntimeError("Unsupported platform")
 
 		self.rst.value(1)
 		self.init()
