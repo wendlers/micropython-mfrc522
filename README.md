@@ -17,7 +17,7 @@ For the ESP8266 there are multiple solutions to do that. E.g. use the
 I used the following pins for my setup:
 
 | Signal    | GPIO ESP8266 | GPIO WiPy      | Note                                 |
-| --------- | ------------ | ----------------------------------------------------- |
+| --------- | ------------ | -------------- | ------------------------------------ |
 | sck       | 0            | "GP14"         |                                      |
 | mosi      | 2            | "GP16"         |                                      |
 | miso      | 4            | "GP15"         |                                      |
