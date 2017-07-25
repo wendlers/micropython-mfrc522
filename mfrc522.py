@@ -26,7 +26,7 @@ class MFRC522:
 		
 		board = uname()[0]
 
-		if board == 'WiPy' || board == 'LoPy' || board == 'FiPy':
+		if board == 'WiPy' or board == 'LoPy' or board == 'FiPy':
 			self.spi = SPI(0)
 			self.spi.init(SPI.MASTER, baudrate=1000000, pins=(self.sck, self.mosi, self.miso))
 		elif board == 'esp8266':
