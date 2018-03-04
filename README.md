@@ -33,7 +33,11 @@ Now enter the REPL you could run one of the two exmaples:
 For detecting, authenticating and reading from a card:
  
     import read
-    read.do_read()
+    cs_pin = 2
+    reader_number = 0
+    read.do_read(cs_pin, reader_number)
+   
+This way you can use multiple readers. Just make sure to assign a new cs_pin. The other pins can be shared.
     
 This will wait for a MifareClassic 1k card. As soon the card is detected, it is authenticated, and 
 16 bytes are read from address 0x08.
