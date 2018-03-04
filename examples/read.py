@@ -2,16 +2,21 @@ import mfrc522
 from os import uname
 
 
-def do_read():
+def do_read(x,y):
 
 	if uname()[0] == 'WiPy':
 		rdr = mfrc522.MFRC522("GP14", "GP16", "GP15", "GP22", "GP17")
 	elif uname()[0] == 'esp8266':
 		rdr = mfrc522.MFRC522(0, 2, 4, 5, 14)
+		
+	elif uname()[0] == 'esp32':
+		rdr = mfrc522.MFRC522(18, 23, 19, 4, x)
+		
 	else:
 		raise RuntimeError("Unsupported platform")
 
 	print("")
+	print('READER %s' %y)
 	print("Place card before reader to read from address 0x08")
 	print("")
 

@@ -32,6 +32,9 @@ class MFRC522:
 		elif board == 'esp8266':
 			self.spi = SPI(baudrate=100000, polarity=0, phase=0, sck=self.sck, mosi=self.mosi, miso=self.miso)
 			self.spi.init()
+		elif board == 'esp32':
+			self.spi = SPI(baudrate=100000, polarity=0, phase=0, sck=self.sck, mosi=self.mosi, miso=self.miso)
+			self.spi.init()
 		else:
 			raise RuntimeError("Unsupported platform")
 

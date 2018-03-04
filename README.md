@@ -1,3 +1,5 @@
+# 03-04-2018 ADDED SUPPORT FOR ESP32
+
 # micropython-mfrc522
 (Micro)Python class to access the MFRC522 RFID reader
 
@@ -13,23 +15,29 @@ the [WiPy](https://github.com/micropython/micropython/tree/master/cc3200).
 Put the modules ``mfrc522.py``, ``examples/read.py``, ``examples/write.py`` to the root of the flash FS on your board. 
 For the ESP8266 there are multiple solutions to do that. E.g. use the 
 [WebREPL file transfer](https://github.com/micropython/webrepl), or [mpfshell](https://github.com/wendlers/mpfshell). 
- 
+
+For ESP32 I use ampy to transfer the files.
+
 I used the following pins for my setup:
 
-| Signal    | GPIO ESP8266 | GPIO WiPy      | Note                                 |
+| Signal    | GPIO ESP8266 | GPIO WiPy      | ESP32                                |
 | --------- | ------------ | -------------- | ------------------------------------ |
-| sck       | 0            | "GP14"         |                                      |
-| mosi      | 2            | "GP16"         |                                      |
-| miso      | 4            | "GP15"         |                                      |
-| rst       | 5            | "GP22"         |                                      |
-| cs        | 14           | "GP14"         |Labeled SDA on most RFID-RC522 boards |
+| sck       | 0            | "GP14"         | 18                                   |
+| mosi      | 2            | "GP16"         | 23                                   |
+| miso      | 4            | "GP15"         | 19                                   |
+| rst       | 5            | "GP22"         | 4                                    |
+| cs        | 14           | "GP14"         | 2                                    |
  
 Now enter the REPL you could run one of the two exmaples: 
 
 For detecting, authenticating and reading from a card:
  
     import read
-    read.do_read()
+    cs_pin = 2
+    reader_number = 0
+    read.do_read(cs_pin, reader_number)
+   
+This way you can use multiple readers. Just make sure to assign a new cs_pin. The other pins can be shared.
     
 This will wait for a MifareClassic 1k card. As soon the card is detected, it is authenticated, and 
 16 bytes are read from address 0x08.
