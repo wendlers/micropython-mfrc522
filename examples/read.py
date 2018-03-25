@@ -2,12 +2,15 @@ import mfrc522
 from os import uname
 
 
-def do_read():
+def do_read( esp=None):
 
 	if uname()[0] == 'WiPy':
 		rdr = mfrc522.MFRC522("GP14", "GP16", "GP15", "GP22", "GP17")
-	elif uname()[0] == 'esp8266':
-		rdr = mfrc522.MFRC522(0, 2, 4, 5, 14)
+	elif uname()[0] == 'esp8266' and esp != None:
+		if esp==1:
+			rdr = mfrc522.MFRC522(rst=2,cs=16,spiblk=1)
+		else:
+			rdr = mfrc522.MFRC522(rst=2,cs=16,sck=14,mosi=13,miso=12)
 	else:
 		raise RuntimeError("Unsupported platform")
 
@@ -44,3 +47,4 @@ def do_read():
 
 	except KeyboardInterrupt:
 		print("Bye")
+

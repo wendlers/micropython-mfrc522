@@ -18,18 +18,22 @@ I used the following pins for my setup:
 
 | Signal    | GPIO ESP8266 | GPIO WiPy      | Note                                 |
 | --------- | ------------ | -------------- | ------------------------------------ |
-| sck       | 0            | "GP14"         |                                      |
-| mosi      | 2            | "GP16"         |                                      |
-| miso      | 4            | "GP15"         |                                      |
-| rst       | 5            | "GP22"         |                                      |
-| cs        | 14           | "GP14"         |Labeled SDA on most RFID-RC522 boards |
- 
+| sck       | 14           | "GP14"         |For hardware sck (esp)                |
+| mosi      | 13           | "GP16"         |For hardware mosi (esp)               |
+| miso      | 12           | "GP15"         |For hardware miso (esp)               |
+| rst       | 2            | "GP22"         |                                      |
+| cs        | 16           | "GP14"         |Labeled SDA on most RFID-RC522 boards |
+
+Note for the hardware spi on the esp8266 the sck, mosi, and miso pins don't need to be specified for initalization,
+only spiblk needs to be set to 1. In software mode they will need to be specified and spblk can be left unset.
+
 Now enter the REPL you could run one of the two exmaples: 
 
 For detecting, authenticating and reading from a card:
  
     import read
-    read.do_read()
+    read.do_read()  #for software
+    read.do_read(1) #for esp hardware
     
 This will wait for a MifareClassic 1k card. As soon the card is detected, it is authenticated, and 
 16 bytes are read from address 0x08.

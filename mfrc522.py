@@ -13,25 +13,31 @@ class MFRC522:
 	AUTHENT1A = 0x60
 	AUTHENT1B = 0x61
 
-	def __init__(self, sck, mosi, miso, rst, cs):
-
-		self.sck = Pin(sck, Pin.OUT)
-		self.mosi = Pin(mosi, Pin.OUT)
-		self.miso = Pin(miso)
+	def __init__(self, rst, cs, spiblk=None, sck=None, mosi=None, miso=None):
+		if spiblk == None and (sck != mosi != miso):
+			self.sck = Pin(sck, Pin.OUT)
+			self.mosi = Pin(mosi, Pin.OUT)
+			self.miso = Pin(miso)
 		self.rst = Pin(rst, Pin.OUT)
 		self.cs = Pin(cs, Pin.OUT)
 
 		self.rst.value(0)
 		self.cs.value(1)
-		
+
 		board = uname()[0]
 
 		if board == 'WiPy' or board == 'LoPy' or board == 'FiPy':
-			self.spi = SPI(0)
+			if spiblk == None:
+				self.spi = SPI(0)
+			else:
+				self.spi = SPI(spiblk)
 			self.spi.init(SPI.MASTER, baudrate=1000000, pins=(self.sck, self.mosi, self.miso))
 		elif board == 'esp8266':
-			self.spi = SPI(baudrate=100000, polarity=0, phase=0, sck=self.sck, mosi=self.mosi, miso=self.miso)
-			self.spi.init()
+			if spiblk == None:
+				self.spi = SPI(baudrate=1000000, polarity=0, phase=0, sck=self.sck, mosi=self.mosi, miso=self.miso)
+			else:
+				self.spi = SPI(spiblk, baudrate=1000000, polarity=0, phase=0)
+			#self.spi.init()
 		else:
 			raise RuntimeError("Unsupported platform")
 
