@@ -8,6 +8,8 @@ def do_read():
 		rdr = mfrc522.MFRC522("GP14", "GP16", "GP15", "GP22", "GP17")
 	elif uname()[0] == 'esp8266':
 		rdr = mfrc522.MFRC522(0, 2, 4, 5, 14)
+	elif uname()[0] == 'esp32':
+		rdr = mfrc522.MFRC522(14, 13, 12, 27, 15)
 	else:
 		raise RuntimeError("Unsupported platform")
 
