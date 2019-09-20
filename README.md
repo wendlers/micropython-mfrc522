@@ -1,6 +1,12 @@
 # micropython-mfrc522
 (Micro)Python class to access the MFRC522 RFID reader
 
+Sept 20 2019
+Modification  to be able to read 7 and 10 BYTES RFID
+P.S. I didn't test the write mode.
+
+
+
 Basic class to access RFID readers of the type [MFRC522](http://www.nxp.com/documents/data_sheet/MFRC522.pdf). 
 This is basically a re-write of [this](https://github.com/mxgxw/MFRC522-python) Python port for the MFRC522. I 
 tried to strip things down and make them more "pythonic" so the result is small enough to run on 
