@@ -4,6 +4,7 @@ from os import uname
 
 class MFRC522:
 
+	DEBUG = False
 	OK = 0
 	NOTAGERR = 1
 	ERR = 2
@@ -12,6 +13,11 @@ class MFRC522:
 	REQALL = 0x52
 	AUTHENT1A = 0x60
 	AUTHENT1B = 0x61
+  
+	PICC_ANTICOLL1 = 0x93
+	PICC_ANTICOLL2 = 0x95
+	PICC_ANTICOLL3 = 0x97
+  
 
 	def __init__(self, sck, mosi, miso, rst, cs):
 
@@ -29,7 +35,7 @@ class MFRC522:
 		if board == 'WiPy' or board == 'LoPy' or board == 'FiPy':
 			self.spi = SPI(0)
 			self.spi.init(SPI.MASTER, baudrate=1000000, pins=(self.sck, self.mosi, self.miso))
-		elif board == 'esp8266':
+		elif (board == 'esp8266') or (board == 'esp32'):
 			self.spi = SPI(baudrate=100000, polarity=0, phase=0, sck=self.sck, mosi=self.mosi, miso=self.miso)
 			self.spi.init()
 		else:
@@ -169,11 +175,11 @@ class MFRC522:
 			stat = self.ERR
 
 		return stat, bits
-
-	def anticoll(self):
+  
+	def anticoll(self,anticolN):
 
 		ser_chk = 0
-		ser = [0x93, 0x20]
+		ser = [anticolN, 0x20]
 
 		self._wreg(0x0D, 0x00)
 		(stat, recv, bits) = self._tocard(0x0C, ser)
@@ -189,12 +195,67 @@ class MFRC522:
 
 		return stat, recv
 
-	def select_tag(self, ser):
+    
+	def PcdSelect(self, serNum,anticolN):
+		backData = []
+		buf = []
+		buf.append(anticolN)
+		buf.append(0x70)
+		i = 0
+		while i<5:
+			buf.append(serNum[i])
+			i = i + 1
+		pOut = self._crc(buf)
+		buf.append(pOut[0])
+		buf.append(pOut[1])
+		(status, backData, backLen) = self._tocard( 0x0C, buf)
+		if (status == self.OK) and (backLen == 0x18):
+			return  1
+		else:
+			return 0
+    
+    
+	def SelectTagSN(self):
+		valid_uid=[]
+		(status,uid)= self.anticoll(self.PICC_ANTICOLL1)
+		if status != self.OK:
+			return  (self.ERR,[])
 
-		buf = [0x93, 0x70] + ser[:5]
-		buf += self._crc(buf)
-		(stat, recv, bits) = self._tocard(0x0C, buf)
-		return self.OK if (stat == self.OK) and (bits == 0x18) else self.ERR
+		if self.DEBUG:   print("anticol(1) {}".format(uid))
+		if self.PcdSelect(uid,self.PICC_ANTICOLL1) == 0:
+			return (self.MI_ERR,[])
+		if self.DEBUG:   print("pcdSelect(1) {}".format(uid))
+
+		#check if first byte is 0x88
+		if uid[0] == 0x88 :
+			#ok we have another type of card
+			valid_uid.extend(uid[1:4])
+			(status,uid)=self.anticoll(self.PICC_ANTICOLL2)
+			if status != self.OK:
+				return (self.ERR,[])
+			if self.DEBUG: print("Anticol(2) {}".format(uid))
+			rtn =  self.PcdSelect(uid,self.PICC_ANTICOLL2)
+			if self.DEBUG: print("pcdSelect(2) return={} uid={}".format(rtn,uid))
+			if rtn == 0:
+				return (self.ERR,[])
+			if self.DEBUG: print("PcdSelect2() {}".format(uid))
+			#now check again if uid[0] is 0x88
+			if uid[0] == 0x88 :
+				valid_uid.extend(uid[1:4])
+				(status , uid) = self.anticoll(self.PICC_ANTICOLL3)
+				if status != self.OK:
+					return (self.ERR,[])
+				if self.DEBUG: print("Anticol(3) {}".format(uid))
+				if self.MFRC522_PcdSelect(uid,self.PICC_ANTICOLL3) == 0:
+					return (self.ERR,[])
+				if self.DEBUG: print("PcdSelect(3) {}".format(uid))
+		valid_uid.extend(uid[0:4])
+		return (self.OK , valid_uid)
+    
+    
+   
+       
+    
 
 	def auth(self, mode, addr, sect, ser):
 		return self._tocard(0x0E, [mode, addr] + sect + ser[:4])[0]
@@ -227,3 +288,6 @@ class MFRC522:
 				stat = self.ERR
 
 		return stat
+
+
+
