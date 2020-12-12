@@ -6,7 +6,7 @@ def do_write():
 
 	if uname()[0] == 'WiPy':
 		rdr = mfrc522.MFRC522("GP14", "GP16", "GP15", "GP22", "GP17")
-	elif uname()[0] == 'esp8266':
+	elif uname()[0] == 'esp8266' or uname()[0] == 'esp32':
 		rdr = mfrc522.MFRC522(0, 2, 4, 5, 14)
 	else:
 		raise RuntimeError("Unsupported platform")
