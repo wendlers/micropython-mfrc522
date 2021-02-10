@@ -225,7 +225,7 @@ class MFRC522:
 
 		if self.DEBUG:   print("anticol(1) {}".format(uid))
 		if self.PcdSelect(uid,self.PICC_ANTICOLL1) == 0:
-			return (self.MI_ERR,[])
+			return (self.ERR,[])
 		if self.DEBUG:   print("pcdSelect(1) {}".format(uid))
 
 		#check if first byte is 0x88
