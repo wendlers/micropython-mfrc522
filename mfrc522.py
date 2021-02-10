@@ -19,7 +19,7 @@ class MFRC522:
 	PICC_ANTICOLL3 = 0x97
   
 
-	def __init__(self, sck, mosi, miso, rst, cs):
+	def __init__(self, sck, mosi, miso, rst, cs,baudrate=1000000,spi_id=0):
 
 		self.sck = Pin(sck, Pin.OUT)
 		self.mosi = Pin(mosi, Pin.OUT)
@@ -38,6 +38,8 @@ class MFRC522:
 		elif (board == 'esp8266') or (board == 'esp32'):
 			self.spi = SPI(baudrate=100000, polarity=0, phase=0, sck=self.sck, mosi=self.mosi, miso=self.miso)
 			self.spi.init()
+		elif board == 'rp2':
+			self.spi = SPI(spi_id,baudrate=baudrate,sck=self.sck, mosi= self.mosi, miso= self.miso)
 		else:
 			raise RuntimeError("Unsupported platform")
 
