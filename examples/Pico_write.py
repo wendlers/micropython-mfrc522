@@ -1,5 +1,12 @@
 from mfrc522 import MFRC522
 
+'''
+BE AWARE that sectors(3,7,11,15,...,63) are access block.
+if you want to change  (sector % 4) == 3 you should
+know how keys and permission work!
+'''
+
+
 
 def uidToString(uid):
     mystring = ""
