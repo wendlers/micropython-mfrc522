@@ -1,6 +1,11 @@
 # micropython-mfrc522
 (Micro)Python class to access the MFRC522 RFID reader
 
+D.Perron
+Feb. 2021
+Add Raspberry Pi Pico compatibility
+
+D.Perron
 Sept 20 2019
 Modification  to be able to read 7 and 10 BYTES RFID
 P.S. I didn't test the write mode.
@@ -32,18 +37,11 @@ I used the following pins for my setup:
  
 Now enter the REPL you could run one of the two exmaples: 
 
-For detecting, authenticating and reading from a card:
- 
-    import read
-    read.do_read()
-    
-This will wait for a MifareClassic 1k card. As soon the card is detected, it is authenticated, and 
-16 bytes are read from address 0x08.
+The Pico_write example has been added but be aware of
 
-For detecting, authenticating and writing to a card:
+- The software treated the memory has 64 sectors of 16 Bytes.
+- In reality the mifare card is 16 sectors of 4 block which are 16 byte.
+  The Block 0,1 and 2 are data block. The block 3 is the access  block
+- BE AWARE if you write sector (3,7,11,15...,63) then you should know what you do
 
-    import write
-    write.do_write()
 
-This will wait for a MifareClassic 1k card. As soon the card is detected, it is authenticated, and 
-16 bytes written to address 0x08.
