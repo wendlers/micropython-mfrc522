@@ -203,10 +203,13 @@ class MFRC522:
         buf = []
         buf.append(anticolN)
         buf.append(0x70)
-        i = 0
-        while i<5:
-            buf.append(serNum[i])
-            i = i + 1
+        #i = 0
+        ###xorsum=0;
+        for i in serNum:
+            buf.append(i)
+        #while i<5:
+        #    buf.append(serNum[i])
+        #    i = i + 1
         pOut = self._crc(buf)
         buf.append(pOut[0])
         buf.append(pOut[1])
@@ -225,7 +228,7 @@ class MFRC522:
 
         if self.DEBUG:   print("anticol(1) {}".format(uid))
         if self.PcdSelect(uid,self.PICC_ANTICOLL1) == 0:
-            return (self.MI_ERR,[])
+            return (self.ERR,[])
         if self.DEBUG:   print("pcdSelect(1) {}".format(uid))
 
         #check if first byte is 0x88
@@ -252,7 +255,11 @@ class MFRC522:
                     return (self.ERR,[])
                 if self.DEBUG: print("PcdSelect(3) {}".format(uid))
         valid_uid.extend(uid[0:5])
-        return (self.OK , valid_uid)
+        # if we are here than the uid is ok
+        # let's remove the last BYTE whic is the XOR sum
+        
+        return (self.OK , valid_uid[:len(valid_uid)-1])
+        #return (self.OK , valid_uid)
     
     
    
@@ -261,6 +268,7 @@ class MFRC522:
 
     def auth(self, mode, addr, sect, ser):
         return self._tocard(0x0E, [mode, addr] + sect + ser[:4])[0]
+        
 
     def stop_crypto1(self):
         self._cflags(0x08, 0x08)
@@ -291,8 +299,8 @@ class MFRC522:
 
         return stat
 
-    def MFRC522_DumpClassic1K(self, key, uid):
-        for i in range(64):
+    def MFRC522_DumpClassic1K(self, key, uid, Start=0, End=64):
+        for i in range(Start,End):
             status = self.auth(self.AUTHENT1A, i, key, uid)
             # Check if authenticated
             print("{:02d}: ".format(i),end="")
