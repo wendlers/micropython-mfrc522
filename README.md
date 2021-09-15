@@ -10,6 +10,13 @@ Sept 20 2019
 Modification  to be able to read 7 and 10 BYTES RFID
 P.S. I didn't test the write mode.
 
+D.Perron
+Sept 15 2021
+Addition of RfidAccess Class!  this allows to set or read access bits.
+Addition of read and write using sector/block and selecting KEYA or KEYB
+Add more example on how to change access block#3
+
+
 
 
 Basic class to access RFID readers of the type [MFRC522](http://www.nxp.com/documents/data_sheet/MFRC522.pdf). 
@@ -41,7 +48,11 @@ The Pico_write example has been added but be aware of
 
 - The software treated the memory has 64 sectors of 16 Bytes.
 - In reality the mifare card is 16 sectors of 4 block which are 16 byte.
-  The Block 0,1 and 2 are data block. The block 3 is the access  block
-- BE AWARE if you write sector (3,7,11,15...,63) then you should know what you do
-
+  The Block 0,1 and 2 are data block. The block 3 is the access  block.
+- BE AWARE if you write sector (3,7,11,15...,63) then you should know what you do.
+- CreateNdefTag.py   Explain how to set access block on each sector. It will create an empty NDEF tag.
+- EraseNdefTag.py    Recreate a blank Mifare tag after you use CreateNdefTag.py.
+- ReadNdefTag.py     Dump the contents of a NDEF tag.
+- Pico_read.py       Dump the contents of a Mifare card using the default key.
+ 
 
