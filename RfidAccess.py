@@ -108,6 +108,11 @@ class RfidAccess:
         self.C2 = byte8 & 0xf
         self.C3 = (byte8 & 0xf0) >>4
         return ((self.C1 ^ self.C1_Inv) & (self.C2 ^ self.C2_Inv) & (self.C3 ^ self.C3_Inv)) & 0xf == 0xf
+    
+    def decodeAccessFromBlock3(self, block3):
+        if len(block3)!= 16:
+            return False
+        return self.decodeAccess(block3[6],block3[7],block3[8])
 
 
     def showTrailerAccess(self):
