@@ -345,14 +345,12 @@ class MFRC522:
             return self.write(absoluteBlock, data)
         return self.ERR
 
-    def readSectorBlock(self,uid ,sector, block, data,keyA=None, keyB = None):
+    def readSectorBlock(self,uid ,sector, block, keyA=None, keyB = None):
         absoluteBlock =  sector * 4 + (block % 4)
-        if page > 63 :
+        if absoluteBlock > 63 :
             return self.ERR, None
-        if len(data) != 16:
-            return self.ERR, None
-        if self.authKeys(uid,page,KeyA,KeyB) != self.ERR :
-            return self.read(page)
+        if self.authKeys(uid,absoluteBlock,keyA,keyB) != self.ERR :
+            return self.read(absoluteBlock)
         return self.ERR, None
 
     def MFRC522_DumpClassic1K(self,uid, Start=0, End=64, keyA=None, keyB=None):
