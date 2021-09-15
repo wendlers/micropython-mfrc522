@@ -14,7 +14,7 @@ D.Perron
 Sept 15 2021
 Addition of RfidAccess Class!  this allows to set or read access bits.<br>
 Addition of read and write using sector/block and selecting KEYA or KEYB.<br>
-Add more examples on how to change access block. (Block3 of each sector>.<br>
+Add more examples on how to change access block. (Block3 of each sector).<br>
 
 
 
