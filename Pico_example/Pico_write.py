@@ -17,7 +17,7 @@ def uidToString(uid):
 reader = MFRC522(spi_id=0,sck=2,miso=4,mosi=3,cs=1,rst=0)
 
 print("")
-print("Place card before reader to read from address 0x08")
+print("Please place card on reader")
 print("")
 
 key = [0xFF,0xFF,0xFF,0xFF,0xFF,0xFF]
@@ -32,7 +32,7 @@ try:
             if stat == reader.OK:
                 print(uid)
                 print("Card detected %s" % uidToString(uid))
-                reader.MFRC522_DumpClassic1K(key, uid)
+                reader.MFRC522_DumpClassic1K(uid,keyA=key)
                 print("Test ! writing sector 2, block 0 (absolute block(8)")
                 print("with [ 00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 ]")
                 absoluteBlock=8
@@ -43,7 +43,7 @@ try:
                 if status == reader.OK:
                     status = reader.write(absoluteBlock,value)
                     if status == reader.OK:
-                        reader.MFRC522_DumpClassic1K(key, uid)
+                        reader.MFRC522_DumpClassic1K(uid,keyA=key)
                     else:
                         print("unable to write")
                 else:

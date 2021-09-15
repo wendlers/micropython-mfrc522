@@ -220,22 +220,49 @@ class MFRC522:
             return 0
     
     
+    def SelectTag(self, uid):
+        byte5 = 0
+        
+        #(status,puid)= self.anticoll(self.PICC_ANTICOLL1)
+        #print("uid",uid,"puid",puid)
+        for i in uid:
+            byte5 = byte5 ^ i
+        puid = uid + [byte5]
+        
+        if self.PcdSelect(puid,self.PICC_ANTICOLL1) == 0:
+            return (self.ERR,[])
+        return (self.OK , uid)
+        
+    def tohexstring(self,v):
+        s="["
+        for i in v:
+            if i != v[0]:
+                s = s+ ", "
+            s=s+ "0x{:02X}".format(i)
+        s= s+ "]"
+        return s
+        
+  
+            
+    
     def SelectTagSN(self):
         valid_uid=[]
         (status,uid)= self.anticoll(self.PICC_ANTICOLL1)
+        #print("Select Tag 1:",self.tohexstring(uid))
         if status != self.OK:
             return  (self.ERR,[])
-
+        
         if self.DEBUG:   print("anticol(1) {}".format(uid))
         if self.PcdSelect(uid,self.PICC_ANTICOLL1) == 0:
             return (self.ERR,[])
         if self.DEBUG:   print("pcdSelect(1) {}".format(uid))
-
+        
         #check if first byte is 0x88
         if uid[0] == 0x88 :
             #ok we have another type of card
             valid_uid.extend(uid[1:4])
             (status,uid)=self.anticoll(self.PICC_ANTICOLL2)
+            #print("Select Tag 2:",self.tohexstring(uid))
             if status != self.OK:
                 return (self.ERR,[])
             if self.DEBUG: print("Anticol(2) {}".format(uid))
@@ -248,6 +275,7 @@ class MFRC522:
             if uid[0] == 0x88 :
                 valid_uid.extend(uid[1:4])
                 (status , uid) = self.anticoll(self.PICC_ANTICOLL3)
+                #print("Select Tag 3:",self.tohexstring(uid))
                 if status != self.OK:
                     return (self.ERR,[])
                 if self.DEBUG: print("Anticol(3) {}".format(uid))
@@ -268,7 +296,15 @@ class MFRC522:
 
     def auth(self, mode, addr, sect, ser):
         return self._tocard(0x0E, [mode, addr] + sect + ser[:4])[0]
-        
+    
+    def authKeys(self,uid,addr,keyA=None, keyB=None):
+        status = self.ERR
+        if keyA is not None:
+            status = self.auth(self.AUTHENT1A, addr, keyA, uid)
+        elif keyB is not None:
+            status = self.auth(self.AUTHENT1B, addr, keyB, uid)
+        return status
+       
 
     def stop_crypto1(self):
         self._cflags(0x08, 0x08)
@@ -278,7 +314,7 @@ class MFRC522:
         data = [0x30, addr]
         data += self._crc(data)
         (stat, recv, _) = self._tocard(0x0C, data)
-        return recv if stat == self.OK else None
+        return stat, recv
 
     def write(self, addr, data):
 
@@ -296,22 +332,53 @@ class MFRC522:
             (stat, recv, bits) = self._tocard(0x0C, buf)
             if not (stat == self.OK) or not (bits == 4) or not ((recv[0] & 0x0F) == 0x0A):
                 stat = self.ERR
-
         return stat
 
-    def MFRC522_DumpClassic1K(self, key, uid, Start=0, End=64):
-        for i in range(Start,End):
-            status = self.auth(self.AUTHENT1A, i, key, uid)
+
+    def writeSectorBlock(self,uid, sector, block, data, keyA=None, keyB = None):
+        absoluteBlock =  sector * 4 + (block % 4)
+        if absoluteBlock > 63 :
+            return self.ERR
+        if len(data) != 16:
+            return self.ERR
+        if self.authKeys(uid,absoluteBlock,keyA,keyB) != self.ERR :
+            return self.write(absoluteBlock, data)
+        return self.ERR
+
+    def readSectorBlock(self,uid ,sector, block, data,keyA=None, keyB = None):
+        absoluteBlock =  sector * 4 + (block % 4)
+        if page > 63 :
+            return self.ERR, None
+        if len(data) != 16:
+            return self.ERR, None
+        if self.authKeys(uid,page,KeyA,KeyB) != self.ERR :
+            return self.read(page)
+        return self.ERR, None
+
+    def MFRC522_DumpClassic1K(self,uid, Start=0, End=64, keyA=None, keyB=None):
+        for absoluteBlock in range(Start,End):
+            status = self.authKeys(uid,absoluteBlock,keyA,keyB)
             # Check if authenticated
-            print("{:02d}: ".format(i),end="")
+            print("{:02d} S{:02d} B{:1d}: ".format(absoluteBlock, absoluteBlock//4 , absoluteBlock % 4),end="")
             if status == self.OK:                    
-                block = self.read(i)
-                if block is None:
-                    print("-- ")
+                status, block = self.read(absoluteBlock)
+                if status == self.ERR:
+                    break
                 else:
                     for value in block:
                         print("{:02X} ".format(value),end="")
+                    print("  ",end="")
+                    for value in block:
+                        if (value > 0x20) and (value < 0x7f):
+                            print(chr(value),end="")
+                        else:
+                            print('.',end="")
                     print("")
             else:
-                print("Authentication error")
-
+                break
+        if status == self.ERR:
+            print("Authentication error")
+            return self.ERR
+        return self.OK
+        
+                
