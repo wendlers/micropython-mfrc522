@@ -279,7 +279,7 @@ class MFRC522:
                 if status != self.OK:
                     return (self.ERR,[])
                 if self.DEBUG: print("Anticol(3) {}".format(uid))
-                if self.MFRC522_PcdSelect(uid,self.PICC_ANTICOLL3) == 0:
+                if self.PcdSelect(uid,self.PICC_ANTICOLL3) == 0:
                     return (self.ERR,[])
                 if self.DEBUG: print("PcdSelect(3) {}".format(uid))
         valid_uid.extend(uid[0:5])
