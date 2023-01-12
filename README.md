@@ -16,13 +16,13 @@ For the ESP8266 there are multiple solutions to do that. E.g. use the
  
 I used the following pins for my setup:
 
-| Signal    | GPIO ESP8266 | GPIO WiPy      | Note                                 |
-| --------- | ------------ | -------------- | ------------------------------------ |
-| sck       | 0            | "GP14"         |                                      |
-| mosi      | 2            | "GP16"         |                                      |
-| miso      | 4            | "GP15"         |                                      |
-| rst       | 5            | "GP22"         |                                      |
-| cs        | 14           | "GP14"         |Labeled SDA on most RFID-RC522 boards |
+| Signal    | GPIO ESP8266 | GPIO WiPy      | GPIO Pi Pico   | Note                                 |
+| --------- | ------------ | -------------- | -------------- | ------------------------------------ |
+| sck       | 0            | "GP14"         | 18             |                                      |
+| mosi      | 2            | "GP16"         | 19             |                                      |
+| miso      | 4            | "GP15"         | 16             |                                      |
+| rst       | 5            | "GP22"         | 20             |                                      |
+| cs        | 14           | "GP14"         | 17             | SDA on most RFID-RC522 boards        |
  
 Now enter the REPL you could run one of the two exmaples: 
 
