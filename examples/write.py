@@ -4,10 +4,12 @@ from os import uname
 
 def do_write():
 
-	if uname()[0] == 'WiPy':
+	if uname()[0] == 'WiPy' or board == 'LoPy' or board == 'FiPy':
 		rdr = mfrc522.MFRC522("GP14", "GP16", "GP15", "GP22", "GP17")
 	elif uname()[0] == 'esp8266':
 		rdr = mfrc522.MFRC522(0, 2, 4, 5, 14)
+	elif uname()[0] == 'rp2':
+		rdr = mfrc522.MFRC522(18, 19, 16, 20, 17)
 	else:
 		raise RuntimeError("Unsupported platform")
 
