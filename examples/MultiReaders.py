@@ -2,6 +2,8 @@ from mfrc522 import MFRC522
 import utime
 
 
+# youtube short video about it https://www.youtube.com/watch?v=wE2AamTF5dg
+
 def uidToString(uid):
     mystring = ""
     for i in uid:
