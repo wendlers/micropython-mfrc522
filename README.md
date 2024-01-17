@@ -55,9 +55,10 @@ The Pico_write example has been added but be aware of
 - In reality the mifare card is 16 sectors of 4 block which are 16 byte.
   The Block 0,1 and 2 are data block. The block 3 is the access  block.
 - BE AWARE if you write sector (3,7,11,15...,63) then you should know what you do.
-- CreateNdefTag.py   Explain how to set access block on each sector. It will create an empty NDEF tag.
+- CreateNdefTag.py   Explain how to set access block on each sector. It will create an empty NDEF tag. 
 - EraseNdefTag.py    Recreate a blank Mifare tag after you use CreateNdefTag.py.
 - ReadNdefTag.py     Dump the contents of a NDEF tag.
 - Pico_read.py       Dump the contents of a Mifare card using the default key.
+- Pico_read.py       Dump the contents of NTAG card . 
  
 
