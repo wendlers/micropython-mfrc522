@@ -2,6 +2,11 @@
 (Micro)Python class to access the MFRC522 RFID reader
 
 D.Perron
+Jan. 2024
+ Add NTAG.  mfrc522.py modified.
+ Pico_read.py example contains the NTAG DUMP.
+
+D.Perron
 Feb. 2021
 Add Raspberry Pi Pico compatibility
 
