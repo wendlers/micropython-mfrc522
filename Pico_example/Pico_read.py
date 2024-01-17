@@ -43,7 +43,7 @@ try:
                     #reader.MFRC522_Dump_NTAG(uid,Start=5,End=6)
                 else:
                     defaultKey = [255,255,255,255,255,255]
-                    reader.MFRC522_DumpClassic1K(Start=0, End=64, keyA=defaultKey)
+                    reader.MFRC522_DumpClassic1K(uid,Start=0, End=64, keyA=defaultKey)
                 PreviousCard = uid
             else:
                 pass
