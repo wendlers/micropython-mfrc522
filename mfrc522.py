@@ -9,6 +9,12 @@ class MFRC522:
     NOTAGERR = 1
     ERR = 2
 
+
+    NTAG_213 = 213
+    NTAG_215 = 215
+    NTAG_216 = 216
+    NTAG_NONE = 0
+
     REQIDL = 0x26
     REQALL = 0x52
     AUTHENT1A = 0x60
@@ -29,7 +35,8 @@ class MFRC522:
 
         self.rst.value(0)
         self.cs.value(1)
-        
+        self.NTAG = 0
+        self.NTAG_MaxPage = 0
         board = uname()[0]
 
         if board == 'WiPy' or board == 'LoPy' or board == 'FiPy':
@@ -379,4 +386,91 @@ class MFRC522:
             return self.ERR
         return self.OK
         
+    def MFRC522_Dump_NTAG(self,Start=0, End=135):
+        for absoluteBlock in range(Start,End,4):
+            MaxIndex = 4 * 135
+            status = self.OK
+            print("Page {:02d}: ".format(absoluteBlock),end="")
+            if status == self.OK:                    
+                status, block = self.read(absoluteBlock)
+                if status == self.ERR:
+                    break
+                else:
+                    Index = absoluteBlock*4
+                    for i in range(len(block)):
+                        if Index < MaxIndex :
+                           print("{:02X} ".format(block[i]),end="")
+                        else:
+                           print("   ",end="")
+                        if (i%4)==3:
+                           print(" ",end="")
+                        Index+=1
+                    print("  ",end="")
+                    Index = absoluteBlock*4
+                    for value in block:
+                        if Index < MaxIndex:
+                            if (value > 0x20) and (value < 0x7f):
+                                print(chr(value),end="")
+                            else:
+                                print('.',end="")
+                        Index+=1
+                    print("")
+            else:
+                break
+        if status == self.ERR:
+            print("Authentication error")
+            return self.ERR
+        return self.OK
                 
+    def writeNTAGPage(self,page,data):
+        if page>self.NTAG_MaxPage:
+            return self.ERR
+        if page < 4:
+            return self.ERR
+        if len(data) != 4:
+            return self.ERR
+        
+        return self.write(page,data+[0]*12)
+    
+    def getNTAGVersion(self):
+         buf = [0x60]
+         buf += self._crc(buf)
+         stat, recv,_ = self._tocard(0x0C, buf)
+         return stat, recv
+        
+        
+    #Version NTAG213 = [0x0 ,0x4, 0x4, 0x2, 0x1, 0x0,0x0f, 0x3]
+    #Version NTAG215 = [0x0 ,0x4, 0x4, 0x2, 0x1, 0x0,0x11, 0x3]
+    #Version NTAG216 = [0x0 ,0x4, 0x4, 0x2, 0x1, 0x0,0x13, 0x3]
+            
+    def IsNTAG(self):
+        self.NTAG = self.NTAG_NONE
+        self.NTAG_MaxPage=0
+        (stat , rcv) = self.getNTAGVersion()
+        if stat == self.OK:
+            if len(rcv) < 8:
+                return False  #do we have at least 8 bytes
+            if rcv[0] != 0:
+                return False  #check header
+            if rcv[1] != 4:
+                return False  #check Vendor ID
+            if rcv[2] != 4:
+                return False  #check product type
+            if rcv[3] != 2:
+                return False  #check subtype
+            if rcv[7] != 3:
+                return False  #check protocol
+            if rcv[6] == 0xf:
+                self.NTAG= self.NTAG_213  
+                self.NTAG_MaxPage = 44                  
+                return True
+            if rcv[6] == 0x11:
+                self.NTAG= self.NTAG_215
+                self.NTAG_MaxPage = 134                  
+                return True
+            if rcv[7] == 0x13:
+                self.NTAG= self.NTAG_216
+                self.NTAG_MaxPage = 230                  
+                return True
+        return false
+                    
