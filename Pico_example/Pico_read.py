@@ -42,8 +42,14 @@ try:
                     #reader.writeNTAGPage(5,data)
                     #reader.MFRC522_Dump_NTAG(uid,Start=5,End=6)
                 else:
-                    defaultKey = [255,255,255,255,255,255]
-                    reader.MFRC522_DumpClassic1K(uid,Start=0, End=64, keyA=defaultKey)
+                    (stat, tag_type) = reader.request(reader.REQIDL)
+                    if stat == reader.OK:
+                        (stat, uid2) = reader.SelectTagSN()
+                        if stat == reader.OK:
+                            if uid != uid2:
+                                continue
+                            defaultKey = [255,255,255,255,255,255]
+                            reader.MFRC522_DumpClassic1K(uid,Start=0, End=64, keyA=defaultKey)
                 PreviousCard = uid
             else:
                 pass

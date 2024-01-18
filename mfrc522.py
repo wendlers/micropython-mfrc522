@@ -472,5 +472,5 @@ class MFRC522:
                 self.NTAG= self.NTAG_216
                 self.NTAG_MaxPage = 230                  
                 return True
-        return false
+        return False
                     
